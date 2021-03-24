@@ -1,0 +1,47 @@
+{
+  "variables": {
+    "vm_name": "packerdebian10",
+    "domain": "packerdebian10",
+    "cpus": "4",
+    "memory": "4096",
+    "disk_size": "200000",
+    "disk_block_size": "1",
+    "iso_url": "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-10.8.0-amd64-netinst.iso",
+    "iso_checksum": "sha256:396553f005ad9f86a51e246b1540c60cef676f9c71b95e22b753faef59f89bee"
+  },
+  "builders": [
+    {
+      "vm_name": "{{user `vm_name`}}",
+      "type": "hyperv-iso",
+      "disk_size": "{{user `disk_size`}}",
+      "disk_block_size": "{{user `disk_block_size`}}",	  
+      "guest_additions_mode": "disable",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "communicator": "ssh",
+      "ssh_username": "packer",
+      "ssh_password": "packer",
+      "ssh_timeout": "60m",
+      "http_directory": "./",
+      "boot_wait": "10s",
+      "boot_command": [
+      "<wait>c<wait>",
+      "linux /install.amd/vmlinuz ",
+      "auto=true ",
+      "url=http://{{.HTTPIP}}:{{.HTTPPort}}/netinstall-preseed.cfg ",
+      "hostname={{user `vm_name`}} ",
+      "domain={{user `domain`}} ",
+      "interface=auto ",
+      "vga=788 noprompt quiet --<enter>",
+      "initrd /install.amd/initrd.gz<enter>",
+      "boot<enter>"
+            ],
+      "shutdown_command": "echo 'packer' | sudo -S -E shutdown -P now",
+      "memory": "{{user `memory`}}",
+      "cpus": "{{user `cpus`}}",
+      "generation": 2,
+      "switch_name": "EXTERNAL_UP",
+      "enable_secure_boot": false
+    }
+  ]
+}
